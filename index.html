@@ -16,7 +16,6 @@
     <h1>Bingo Card Generator (Numbers 1-25)</h1>
     <table id="bingoTable"></table>
     <button onclick="generateBingoCard()">Generate New Card</button>
-    
     <script>
         function generateBingoCard() {
             const table = document.getElementById("bingoTable");
@@ -80,11 +79,12 @@
             }
             
             if (bingo) {
-                alert("BINGO!");
+                launchConfetti();
             }
         }
 
         window.onload = generateBingoCard;
     </script>
+     <script src="confetti.js"></script>
 </body>
 </html>
