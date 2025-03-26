@@ -5,23 +5,199 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bingo Generator (1-25)</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        table { border-collapse: collapse; margin: auto; }
-        td { width: 50px; height: 50px; text-align: center; font-size: 20px; border: 1px solid black; cursor: pointer; }
-        .marked { background-color: red; color: white; text-decoration: line-through; }
-        button { margin-top: 20px; padding: 10px; font-size: 16px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            flex-direction: column; 
+        }
+        table { 
+            border-collapse: collapse; 
+            margin: auto; 
+        }
+        td { 
+            width: 50px; 
+            height: 50px; 
+            text-align: center; 
+            font-size: 20px; 
+            border: 1px solid black; 
+            cursor: pointer; 
+        }
+        .marked { 
+            background-color: red; 
+            color: white; 
+            text-decoration: line-through; 
+        }
+        .called-numbers {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-left: 20px;
+             margin-top: 20px;
+            min-width: 100px;
+        }
+        .game-container {
+            display: flex;
+            align-items: flex-start;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .lock-section {
+            display: flex;
+            margin-top: 10px;
+            column-gap: 10px;
+        }
+        #numberInput, #lockKey {
+            width: 150px;
+            margin-right: 10px;
+        }
+
+        .button-1{
+            width: 100px;
+        }
+
+        /* CSS */
+        .button-6 {
+          align-items: center;
+          background-color: #efefef;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          border-radius: .25rem;
+          box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+          box-sizing: border-box;
+          color: rgba(0, 0, 0, 0.85);
+          cursor: pointer;
+          display: inline-flex;
+          font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+          font-size: 16px;
+          font-weight: 600;
+          justify-content: center;
+          line-height: 1.25;
+          margin: 0;
+          min-height: 3rem;
+          padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+          position: relative;
+          text-decoration: none;
+          transition: all 250ms;
+          user-select: none;
+          -webkit-user-select: none;
+          touch-action: manipulation;
+          vertical-align: baseline;
+          width: auto;
+        }
+
+        .button-6:hover,
+        .button-6:focus {
+          border-color: rgba(0, 0, 0, 0.15);
+          box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+          color: rgba(0, 0, 0, 0.65);
+        }
+
+        .button-6:hover {
+          transform: translateY(-1px);
+        }
+
+        .button-6:active {
+          background-color: #F0F0F1;
+          border-color: rgba(0, 0, 0, 0.15);
+          box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px;
+          color: rgba(0, 0, 0, 0.65);
+          transform: translateY(0);
+        }
     </style>
 </head>
 <body>
     <h1>Bingo Card Generator (Numbers 1-25)</h1>
-    <table id="bingoTable"></table>
-    <button onclick="generateBingoCard()">Generate New Card</button>
+    
+    <div class="game-container">
+        <table id="bingoTable"></table>
+        
+        <div class="called-numbers">
+            <h3>Called Numbers</h3>
+            <div id="calledNumbersList"></div>
+        </div>
+    </div>
+    <button class="button-6" onclick="generateBingoCard()">Generate New Card</button>
+    <br><br>
+    <span>For callout person only</span>
+    <div class="lock-section">
+        <input type="password" id="lockKey" placeholder="Enter Lock Key">
+        <button class="button-1" onclick="unlockInput()">Unlock</button>
+    </div>
+    <div class="lock-section">
+        <input type="number" id="numberInput" min="1" max="25" placeholder="Call Number" disabled>
+        <button class="button-1" onclick="addNumber()" id="addNumberBtn" disabled>Call</button>
+    </div>
+
+
+    
+
     <script>
+        const MASTER_KEY = 'bingo2025'; // Master key to unlock number input
+        let calledNumbers = [];
+
+        function unlockInput() {
+            const lockKeyInput = document.getElementById('lockKey');
+            const numberInput = document.getElementById('numberInput');
+            const addNumberBtn = document.getElementById('addNumberBtn');
+
+            if (lockKeyInput.value === MASTER_KEY) {
+                numberInput.disabled = false;
+                addNumberBtn.disabled = false;
+                alert('Input unlocked successfully!');
+            } else {
+                alert('Incorrect key. Access denied.');
+            }
+        }
+
+        function addNumber() {
+            const numberInput = document.getElementById('numberInput');
+            const number = parseInt(numberInput.value);
+
+            // Validate number
+            if (isNaN(number) || number < 1 || number > 25) {
+                alert('Please enter a valid number between 1 and 25');
+                return;
+            }
+
+            // Check for duplicates
+            if (calledNumbers.includes(number)) {
+                alert('This number has already been called');
+                return;
+            }
+
+            // Add number to called list
+            calledNumbers.push(number);
+            updateCalledNumbersList();
+
+            // Highlight on Bingo card
+            highlightNumberOnCard(number);
+
+            // Clear input
+            numberInput.value = '';
+        }
+
+        function updateCalledNumbersList() {
+            const list = document.getElementById('calledNumbersList');
+            list.innerHTML = calledNumbers
+                .sort((a, b) => a - b)
+                .map(num => `<div>${num}</div>`)
+                .join('');
+        }
+
+        function highlightNumberOnCard(number) {
+            const cells = document.querySelectorAll('#bingoTable td');
+            cells.forEach(cell => {
+                if (parseInt(cell.textContent) === number) {
+                    cell.classList.add('marked');
+                }
+            });
+            checkBingo();
+        }
+
         function generateBingoCard() {
             const table = document.getElementById("bingoTable");
             table.innerHTML = "";
             
-            // Generate 25 unique numbers from 1-25
             const numbers = generateUniqueNumbers(1, 25, 25);
             
             const headerRow = table.insertRow();
@@ -44,6 +220,10 @@
                     };
                 });
             }
+
+            // Reset called numbers and list when generating new card
+            calledNumbers = [];
+            updateCalledNumbersList();
         }
 
         function generateUniqueNumbers(min, max, count) {
@@ -79,12 +259,14 @@
             }
             
             if (bingo) {
-                launchConfetti();
+                if (typeof launchConfetti === 'function') {
+                    launchConfetti();
+                }
             }
         }
 
         window.onload = generateBingoCard;
     </script>
-     <script src="confetti.js"></script>
+    <script src="confetti.js"></script>
 </body>
 </html>
