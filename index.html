@@ -30,6 +30,7 @@
             text-decoration: line-through; 
         }
         .called-numbers {
+            display: flex;
             border: 1px solid #ccc;
             padding: 10px;
             margin-left: 20px;
@@ -180,7 +181,7 @@
             const list = document.getElementById('calledNumbersList');
             list.innerHTML = calledNumbers
                 .sort((a, b) => a - b)
-                .map(num => `<div>${num}</div>`)
+                .map(num => `<div>${num},</div>`)
                 .join('');
         }
 
