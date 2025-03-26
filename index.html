@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { border-collapse: collapse; margin: auto; }
+        td { width: 50px; height: 50px; text-align: center; font-size: 20px; border: 1px solid black; cursor: pointer; }
+        .free { background-color: lightgray; }
+        .marked { background-color: red; color: white; text-decoration: line-through; }
+        button { margin-top: 20px; padding: 10px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>Bingo Card Generator</h1>
+    <table id="bingoTable"></table>
+    <button onclick="generateBingoCard()">Generate New Card</button>
+    
+    <script>
+        function generateBingoCard() {
+            const table = document.getElementById("bingoTable");
+            table.innerHTML = "";
+            const columns = {
+                'B': generateUniqueNumbers(1, 15, 5),
+                'I': generateUniqueNumbers(16, 30, 5),
+                'N': generateUniqueNumbers(31, 45, 4), // Middle free space
+                'G': generateUniqueNumbers(46, 60, 5),
+                'O': generateUniqueNumbers(61, 75, 5)
+            };
+            
+            const headerRow = table.insertRow();
+            ['B', 'I', 'N', 'G', 'O'].forEach(letter => {
+                const th = document.createElement("th");
+                th.innerText = letter;
+                headerRow.appendChild(th);
+            });
+
+            for (let i = 0; i < 5; i++) {
+                const row = table.insertRow();
+                ['B', 'I', 'N', 'G', 'O'].forEach((letter, index) => {
+                    const cell = row.insertCell();
+                    if (letter === 'N' && i === 2) {
+                        cell.innerText = "FREE";
+                        cell.classList.add("free", "marked");
+                    } else {
+                        cell.innerText = columns[letter].shift();
+                        cell.onclick = () => {
+                            cell.classList.toggle("marked");
+                            checkBingo();
+                        };
+                    }
+                });
+            }
+        }
+
+        function generateUniqueNumbers(min, max, count) {
+            const numbers = new Set();
+            while (numbers.size < count) {
+                numbers.add(Math.floor(Math.random() * (max - min + 1)) + min);
+            }
+            return Array.from(numbers);
+        }
+
+        function checkBingo() {
+            const table = document.getElementById("bingoTable");
+            let bingo = false;
+            
+            // Check rows
+            for (let i = 1; i < 6; i++) {
+                if ([...table.rows[i].cells].every(cell => cell.classList.contains("marked"))) {
+                    bingo = true;
+                }
+            }
+            
+            // Check columns
+            for (let j = 0; j < 5; j++) {
+                if ([...Array(5).keys()].every(i => table.rows[i + 1].cells[j].classList.contains("marked"))) {
+                    bingo = true;
+                }
+            }
+            
+            // Check diagonals
+            if ([...Array(5).keys()].every(i => table.rows[i + 1].cells[i].classList.contains("marked")) ||
+                [...Array(5).keys()].every(i => table.rows[i + 1].cells[4 - i].classList.contains("marked"))) {
+                bingo = true;
+            }
+            
+            if (bingo) {
+                alert("BINGO!");
+            }
+        }
+
+        window.onload = generateBingoCard;
+    </script>
+</body>
+</html>
