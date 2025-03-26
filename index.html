@@ -3,18 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bingo Generator</title>
+    <title>Bingo Generator (1-25)</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
         table { border-collapse: collapse; margin: auto; }
         td { width: 50px; height: 50px; text-align: center; font-size: 20px; border: 1px solid black; cursor: pointer; }
-        .free { background-color: lightgray; }
         .marked { background-color: red; color: white; text-decoration: line-through; }
         button { margin-top: 20px; padding: 10px; font-size: 16px; }
     </style>
 </head>
 <body>
-    <h1>Bingo Card Generator</h1>
+    <h1>Bingo Card Generator (Numbers 1-25)</h1>
     <table id="bingoTable"></table>
     <button onclick="generateBingoCard()">Generate New Card</button>
     
@@ -22,13 +21,9 @@
         function generateBingoCard() {
             const table = document.getElementById("bingoTable");
             table.innerHTML = "";
-            const columns = {
-                'B': generateUniqueNumbers(1, 15, 5),
-                'I': generateUniqueNumbers(16, 30, 5),
-                'N': generateUniqueNumbers(31, 45, 4), // Middle free space
-                'G': generateUniqueNumbers(46, 60, 5),
-                'O': generateUniqueNumbers(61, 75, 5)
-            };
+            
+            // Generate 25 unique numbers from 1-25
+            const numbers = generateUniqueNumbers(1, 25, 25);
             
             const headerRow = table.insertRow();
             ['B', 'I', 'N', 'G', 'O'].forEach(letter => {
@@ -37,20 +32,17 @@
                 headerRow.appendChild(th);
             });
 
+            let numberIndex = 0;
             for (let i = 0; i < 5; i++) {
                 const row = table.insertRow();
-                ['B', 'I', 'N', 'G', 'O'].forEach((letter, index) => {
+                ['B', 'I', 'N', 'G', 'O'].forEach(() => {
                     const cell = row.insertCell();
-                    if (letter === 'N' && i === 2) {
-                        cell.innerText = "FREE";
-                        cell.classList.add("free", "marked");
-                    } else {
-                        cell.innerText = columns[letter].shift();
-                        cell.onclick = () => {
-                            cell.classList.toggle("marked");
-                            checkBingo();
-                        };
-                    }
+                    cell.innerText = numbers[numberIndex];
+                    numberIndex++;
+                    cell.onclick = () => {
+                        cell.classList.toggle("marked");
+                        checkBingo();
+                    };
                 });
             }
         }
