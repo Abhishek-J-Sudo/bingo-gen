@@ -31,11 +31,20 @@
         }
         .called-numbers {
             display: flex;
+            flex-wrap: wrap;
+            flex-direction: column;
+            max-width: 150px;
             border: 1px solid #ccc;
             padding: 10px;
             margin-left: 20px;
              margin-top: 20px;
             min-width: 100px;
+        }
+        #calledNumbersList{
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            max-width: 150px;
         }
         .game-container {
             display: flex;
